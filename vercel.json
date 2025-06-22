@@ -1,11 +1,11 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "/handler",
-      "use": "@vercel/node"
-    }
-  ],
+"builds": [
+  {
+    "src": "src/handler.js",
+    "use": "@vercel/node"
+  }
+],
   "routes": [
     {
       "src": "/login",
