@@ -11,7 +11,7 @@ const login = async(req,res)=>{
         const phone = user.phone
         const address = user.address
         console.log(name,password,email,phone,address)
-        store.pushstore.push({ name, password, email, phone, address });
+        store.push({ name, password, email, phone, address });
         console.log(store)
     }
     res.send(store)
