@@ -1,0 +1,21 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/handler.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/register",
+      "methods": ["POST"],
+      "dest": "/api/handler"
+    },
+    {
+      "src": "/login",
+      "methods": ["POST"],
+      "dest": "/api/handler"
+    }
+  ]
+}
