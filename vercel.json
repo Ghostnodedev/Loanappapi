@@ -2,20 +2,20 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/handler.js",
+      "src": "/handler",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
-      "src": "/register",
-      "methods": ["POST"],
-      "dest": "/api/handler"
-    },
-    {
       "src": "/login",
       "methods": ["POST"],
-      "dest": "/api/handler"
+      "dest": "/src/handler.js"
+    },
+    {
+      "src": "/register",
+      "methods": ["POST"],
+      "dest": "/src/handler.js"
     }
   ]
 }
