@@ -1,6 +1,4 @@
-// "use strict";
-
-const mysql = require('mysql2/promise');
+"use strict";
 
 // const login = async (req, res) => {
 //   const store = [];
@@ -89,22 +87,15 @@ const mysql = require('mysql2/promise');
 //     }
 // } 
 
+// /api/users.js
+import { sql } from '@vercel/postgres';
+
 export default async function handler(req, res) {
   try {
-    const connection = await mysql.createConnection({
-    host: 'localhost',
-    user: 'Ghostroot',
-    password: 'mysqldb2003',
-    database: 'loan',
-    waitForConnections: true,
-    });
-
-    const [rows] = await connection.execute('SELECT * FROM users');
-    await connection.end(); // close connection
-
-    res.status(200).json({ success: true, data: rows });
+    const result = await sql`SELECT * FROM users;`;
+    res.status(200).json({ success: true, data: result.rows });
   } catch (error) {
-    console.error('DB Error:', error);
+    console.error('Query error:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 }
