@@ -89,11 +89,16 @@
 
 import { get } from '@vercel/edge-config';
 
-export default async function handler(request) {
-  const message = await get('welcomeMessage');
+export const config = {
+  runtime: 'edge',
+};
 
-  return new Response(
-    JSON.stringify({ welcome: message }),
-    { status: 200 }
-  );
+export default async function handler(request) {
+  try {
+    const message = await get('test'); // a valid key
+    return new Response(JSON.stringify({ message }), { status: 200 });
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err.message }), { status: 500 });
+  }
 }
+
