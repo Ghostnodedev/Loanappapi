@@ -75,3 +75,14 @@ const register = async (req, res) => {
 
 module.exports = register;
 
+const getdetails = async(req,res)=>{
+    try {
+      const details = req.body 
+      console.log(details)
+      const {name, bankacc , bankname, address, phone, email, dob, gender, reason , martailstatus, pan , aadhar} = details
+      console.log(name, bankacc , bankname, address, phone, email, dob, gender, reason , martailstatus, pan , aadhar)
+        
+    } catch (error) {
+        
+    }
+} 
