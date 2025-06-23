@@ -20,7 +20,7 @@
     {
       "src": "/mysql",
       "methods": ["GET"],
-      "dest": "/src/mysql.js"
+      "dest": "/src/handler.js"
     }
   ]
 }
