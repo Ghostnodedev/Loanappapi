@@ -89,11 +89,7 @@
 
 import { get } from '@vercel/edge-config';
 
-export const config = {
-  runtime: 'edge', // required for Edge Config
-};
-
-export default async function handler(req) {
+export default async function handler(request) {
   const message = await get('welcomeMessage');
 
   return new Response(
