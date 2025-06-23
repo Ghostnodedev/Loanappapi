@@ -1,11 +1,11 @@
 {
   "version": 2,
-"builds": [
-  {
-    "src": "src/handler.js",
-    "use": "@vercel/node"
-  }
-],
+  "builds": [
+    {
+      "src": "src/handler.js",
+      "use": "@vercel/node"
+    }
+  ],
   "routes": [
     {
       "src": "/login",
@@ -16,6 +16,11 @@
       "src": "/register",
       "methods": ["POST"],
       "dest": "/src/handler.js"
+    },
+    {
+      "src": "/mysql",
+      "methods": ["GET"],
+      "dest": "/src/mysql.js"
     }
   ]
 }
