@@ -18,9 +18,9 @@
       "dest": "/src/handler.js"
     },
     {
-      "src": "/api/handler",
+      "src": "/mysql",
       "methods": ["GET"],
-      "dest": "src/mysql/mysql.js"
+      "dest": "src/handler.js"
     }
   ]
 }
