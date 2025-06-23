@@ -95,7 +95,7 @@ export const config = {
 
 export default async function handler(request) {
   try {
-    const message = await get('test'); // a valid key
+    const message = await get('greeting'); 
     return new Response(JSON.stringify({ message }), { status: 200 });
   } catch (err) {
     return new Response(JSON.stringify({ error: err.message }), { status: 500 });
