@@ -79,16 +79,12 @@ const register = async (req, res) => {
 
 module.exports = register;
 
-// Replace this with your actual database import
-const { get } = require('your-db-client'); // e.g., vercel/edge-config, supabase, etc.
 
-// Fetch all users from DB
 const fetchUsers = async () => {
-  const users = await get("users"); // Your dynamic DB/API call
+  const users = await get("users"); 
   return users;
 };
 
-// Find a specific user by unique field (email used here)
 const fetchFromDB = async (user) => {
   const users = await fetchUsers();
 
