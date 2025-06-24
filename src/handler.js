@@ -89,6 +89,8 @@ const getdetails = async (req, res) => {
         message: "Please provide details",
         });
     }
+
+
     const loan = await process(user);
     console.log(loan)
     if(loan){
@@ -106,16 +108,17 @@ const getdetails = async (req, res) => {
 module.exports = getdetails;
 
 
-const process = async () => {
+const process = async (user) => {
   try {
     const details = await getdetails();
+    console.log(user)
 
-    const userdetails = {
-      name: details.name,
-      bank: details.bankname,
-      bankacc: details.bankacc,
-      phone: details.phone,
-      email: details.email,
+      const userdetails = {
+      name: user.name,
+      bank: user.bankname,
+      bankacc: user.bankacc,
+      phone: user.phone,
+      email: user.email,
     };
 
     const dbdet = {
