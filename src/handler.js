@@ -79,79 +79,89 @@ const register = async (req, res) => {
 
 module.exports = register;
 
-const getdetails = async (req, res) => {
-  try {
-    const user = req.body;
-    console.log(user);
-    if (!user) {
-      return res.status(400).json({
-        status: false,
-        message: "Please provide details",
-        });
-    }
+// Replace this with your actual database import
+const { get } = require('your-db-client'); // e.g., vercel/edge-config, supabase, etc.
 
-
-    const loan = await process(user);
-    console.log(loan)
-    if(loan){
-      return{
-        res: { message: "Data already exists" }
-      }
-    }
-    if(!loan){
-      return{
-        res: { message: "Data does not exist you can proceed" }
-      }
-    }
-  } catch (error) {}
+// Fetch all users from DB
+const fetchUsers = async () => {
+  const users = await get("users"); // Your dynamic DB/API call
+  return users;
 };
-module.exports = getdetails;
 
+// Find a specific user by unique field (email used here)
+const fetchFromDB = async (user) => {
+  const users = await fetchUsers();
 
+  // You can use another identifier here, like phone or Aadhar number
+  return users.find((u) =>
+    u.email === user.email &&
+    u.phone === user.phone &&
+    u.bank_account_number === user.bank_account_number
+  );
+};
+
+// Compare incoming data with DB data
 const process = async (user) => {
   try {
-    const details = await getdetails();
-    console.log(user)
+    const existing = await fetchFromDB(user);
 
-      const userdetails = {
-      name: user.name,
-      bank: user.bankname,
-      bankacc: user.bankacc,
-      phone: user.phone,
-      email: user.email,
-    };
+    if (!existing) return false;
 
-    const dbdet = {
-      name: details.name,
-      bank: details.bankname,
-      bankacc: details.bankacc,
-      phone: details.phone,
-      email: details.email,
-    };
+    const relevantKeys = [
+      "name",
+      "email",
+      "phone",
+      "bank_name",
+      "bank_account_number",
+    ];
 
-    const isMatch = JSON.stringify(userdetails) === JSON.stringify(dbdet);
+    const inputFiltered = Object.fromEntries(
+      Object.entries(user).filter(([key]) => relevantKeys.includes(key))
+    );
 
-    if (isMatch) {
-      console.log("Matched");
-      return {
-        res: { message: "Data already exists" }
-      };
-    }
-    console.log("Not matched, continue...");
-    return {
-      res: { message: "New data or needs update" }
-    };
+    const dbFiltered = Object.fromEntries(
+      Object.entries(existing).filter(([key]) => relevantKeys.includes(key))
+    );
 
+    const isMatch = JSON.stringify(inputFiltered) === JSON.stringify(dbFiltered);
+    return isMatch;
   } catch (error) {
     console.error("Error in process:", error);
-    return {
-      res: { error: "Internal server error" }
-    };
+    throw error;
   }
 };
 
+const getdetails = async (req, res) => {
+  try {
+    const user = req.body;
 
-export async function fetchUsers() {
-  const users = await get("users");
-  return users;
-}
+    if (!user || Object.keys(user).length === 0) {
+      return res.status(400).json({
+        status: false,
+        message: "Please provide user details in the request body",
+      });
+    }
+
+    const exists = await process(user);
+
+    if (exists) {
+      return res.status(200).json({
+        status: true,
+        message: "Data already exists",
+      });
+    } else {
+      return res.status(200).json({
+        status: false,
+        message: "Data does not exist, you can proceed",
+      });
+    }
+  } catch (error) {
+    console.error("Error in getdetails:", error);
+    return res.status(500).json({
+      status: false,
+      message: "Internal Server Error",
+    });
+  }
+};
+
+module.exports = getdetails;
