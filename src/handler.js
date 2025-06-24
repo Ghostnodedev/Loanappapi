@@ -161,60 +161,70 @@ module.exports = register;
 
 // module.exports = getdetails;
 
-const fetchFromDB = async ()=>{
-    const user = await get('users')
-    console.log(user)
-    return user
-}
+// Simulated DB fetch function (replace with your actual DB call)
+const fetchFromDB = async () => {
+  const users = await get("users"); // your DB fetch function
+  return users; // array of user objects
+};
 
-const fetchdata = async(user)=>{
+const fetchdata = async (user) => {
   try {
-    const users = await fetchFromDB()
-    console.log(user)
-    for(const u of user){
-      const name = u.name
-      const password = u.password
-      const email = u.email
-      const phone = u.phone
-      const aadhar = u.aadhar
-      const bankacc = u.bankacc
-      const find = users.find((det)=>{
-        return det.name === name && 
-        det.password === password && 
-        det.email === email && 
-        det.phone === phone && 
-        det.aadhar === aadhar && 
-        det.bankacc === bankacc
-      })
-      if(find){
-        return{
-          res:{message:"Data Already exist you cannot apply"}
-        }
-      }
+    const users = await fetchFromDB();
+    // Adjust keys as per your DB structure and user object
+    const find = users.find((det) => {
+      return (
+        det.name === user.name &&
+        det.email === user.email &&
+        det.phone === user.phone &&
+        det.aadhar_number === user.aadhar_number &&
+        det.bank_account_number === user.bank_account_number
+      );
+    });
+
+    if (find) {
+      return {
+        res: { message: "Data Already exists, you cannot apply" },
+      };
+    } else {
+      return null; // no match
     }
   } catch (error) {
-    console.error(error)
+    console.error("Error in fetchdata:", error);
+    throw error;
   }
-}
+};
 
-const getdetails = async(req,res)=>{
+const getdetails = async (req, res) => {
   try {
-    const user = req.body
-    const users = await fetchdata(user)
-    console.log(users)
-    if(!users){
-      return{
-        res:{message:"User does not exist you cannot apply"}
-      }
-    }else{
-      return{
-        res:{message:"User exist you can apply"}
-      }
+    const user = req.body;
+
+    if (!user || Object.keys(user).length === 0) {
+      return res.status(400).json({
+        status: false,
+        message: "Please provide user details in request body",
+      });
+    }
+
+    const result = await fetchdata(user);
+
+    if (!result) {
+      return res.status(200).json({
+        status: false,
+        message: "User does not exist, you can apply",
+      });
+    } else {
+      return res.status(200).json({
+        status: true,
+        message: result.res.message,
+      });
     }
   } catch (error) {
-    console.error(error.message)
+    console.error("Error in getdetails:", error);
+    return res.status(500).json({
+      status: false,
+      message: "Internal server error",
+    });
   }
-}
+};
+
 module.exports = getdetails;
-
-
