@@ -18,8 +18,8 @@
       "dest": "/src/handler.js"
     },
     {
-      "src": "/handler",
-      "methods": ["GET"],
+      "src": "/getdetails",
+      "methods": ["POST"],
       "dest": "src/handler.js"
     }
   ]
