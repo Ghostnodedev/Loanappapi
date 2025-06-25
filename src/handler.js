@@ -229,80 +229,43 @@ const getdetails = async (req, res) => {
 module.exports = getdetails;
 
 const validdata = async (user) => {
-  const data = user;
-  console.log(data);
-  if (
-    !data.aadhar_number ||
-    !data.pannumber ||
-    !data.bank_account_number ||
-    !data.bank
-  ) {
-    return {
-      status: false,
-    };
-  }
-  const aadhar = data.aadhar_number;
-  const pan = data.pannumber;
-  const bank = data.bank_account_number;
-  const bankname = data.bank;
+  const { aadhar_number, pan_number, bank_account_number, bank_name, cibil_score, pendingloan } = user;
 
-  if (
-    !/^\d{12}$/.test(aadhar) ||
-    aadhar.length !== 12 ||
-    aadhar.startsWith("0")
-  ) {
-    return {
-      status: false,
-      message: "Invalid aadhar number",
-    };
-  }
-  if (
-    !/^[A-Z]{5}\d{4}[A-Z]$/.test(pan) ||
-    pan.length !== 10 ||
-    pan.startsWith("0")
-  ) {
-    return {
-      status: false,
-      message: "Invalid pan number",
-    };
-  }
-  if (!/^\d{10}$/.test(bank)) {
-    return {
-      status: false,
-      message: "Invalid bank account number",
-    };
-  }
-  if (!bankname) {
-    return {
-      status: false,
-      message: "Please provide bank name",
-    };
+  if (!aadhar_number || !pan_number || !bank_account_number || !bank_name) {
+    return { status: false, message: "Missing required fields" };
   }
 
-  const cibil = user.cibil;
-  if (cibil < 720) {
-    return {
-      res: { message: "You're not eligible for the loan" },
-    };
-  } else if (cibil > 720) {
-    return {
-      res: { message: "You're eligible for 100000" },
-    };
-  } else if (cibil > 800) {
-    return {
-      res: { message: "You're eligible for 2000000" },
-    };
-  } else if (cibil > 900) {
-    res: {
-      message: "You're eligible for 3000000";
-    }
+  if (!/^[2-9]{1}[0-9]{11}$/.test(aadhar_number)) {
+    return { status: false, message: "Invalid Aadhar number" };
   }
 
-  const pending = user.pendingloan;
-  if(pending){
-    return{
-      status: false,
-      message: "You have a pending loan"
-    }
+  if (!/^[A-Z]{5}\d{4}[A-Z]$/.test(pan_number)) {
+    return { status: false, message: "Invalid PAN number" };
   }
+
+  if (!/^\d{10,18}$/.test(bank_account_number)) {
+    return { status: false, message: "Invalid bank account number" };
+  }
+
+  if (pendingloan) {
+    return { status: false, message: "You have a pending loan" };
+  }
+
+  // Determine eligibility
+  let eligibilityMsg = "";
+  if (cibil_score < 720) {
+    eligibilityMsg = "You're not eligible for the loan";
+  } else if (cibil_score <= 800) {
+    eligibilityMsg = "You're eligible for ₹100000";
+  } else if (cibil_score <= 900) {
+    eligibilityMsg = "You're eligible for ₹2000000";
+  } else {
+    eligibilityMsg = "You're eligible for ₹3000000";
+  }
+
+  return {
+    status: true,
+    res: { message: eligibilityMsg },
+  };
 };
+
