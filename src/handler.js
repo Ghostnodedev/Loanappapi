@@ -235,7 +235,7 @@ const validdata = async (user) => {
     bank_account_number,
     bank_name,
     cibil_score,
-    pendingloan = false // default to false if not provided
+    pendingloan = false, // default to false if not provided
   } = user;
 
   // Debug: log values
@@ -287,7 +287,6 @@ const validdata = async (user) => {
 
   return {
     status: true,
-    res: { message: eligibility }
+    res: { message: eligibility },
   };
 };
-
