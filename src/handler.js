@@ -206,29 +206,15 @@ const getdetails = async (req, res) => {
     const result = await fetchdata(user);
     const datavalid = await validdata(user);
     console.log(datavalid);
-
-    // Handle validation failure
-    if (datavalid.status === false) {
-      return res.status(400).json({
-        status: false,
-        message: datavalid.message || "Invalid data",
-      });
-    }
-
-    // Extract eligibility if validation passed
-    const eligibility = datavalid?.res?.message || null;
-
     if (!result) {
       return res.status(200).json({
         status: false,
         message: "User does not exist, you can apply",
-        eligibility: eligibility,
       });
     } else {
       return res.status(200).json({
         status: true,
         message: result.res.message,
-        eligibility: eligibility,
       });
     }
   } catch (error) {
@@ -240,68 +226,83 @@ const getdetails = async (req, res) => {
   }
 };
 
-
 module.exports = getdetails;
 
 const validdata = async (user) => {
-  const {
-    aadhar_number,
-    pan_number,
-    bank_account_number,
-    bank_name,
-    cibil_score,
-    pendingloan = false, // default to false if not provided
-  } = user;
-
-  // Debug: log values
-  console.log("aadhar:", aadhar_number);
-  console.log("pan:", pan_number);
-  console.log("bank_account_number:", bank_account_number);
-  console.log("bank_name:", bank_name);
+  const data = user;
+  console.log(data);
+  if (
+    !data.aadhar_number ||
+    !data.pannumber ||
+    !data.bank_account_number ||
+    !data.bank
+  ) {
+    return {
+      status: false,
+    };
+  }
+  const aadhar = data.aadhar_number;
+  const pan = data.pannumber;
+  const bank = data.bank_account_number;
+  const bankname = data.bank;
 
   if (
-    aadhar_number === undefined ||
-    pan_number === undefined ||
-    bank_account_number === undefined ||
-    bank_name === undefined
+    !/^\d{12}$/.test(aadhar) ||
+    aadhar.length !== 12 ||
+    aadhar.startsWith("0")
   ) {
-    return { status: false, message: "Missing required fields" };
+    return {
+      status: false,
+      message: "Invalid aadhar number",
+    };
+  }
+  if (
+    !/^[A-Z]{5}\d{4}[A-Z]$/.test(pan) ||
+    pan.length !== 10 ||
+    pan.startsWith("0")
+  ) {
+    return {
+      status: false,
+      message: "Invalid pan number",
+    };
+  }
+  if (!/^\d{10}$/.test(bank)) {
+    return {
+      status: false,
+      message: "Invalid bank account number",
+    };
+  }
+  if (!bankname) {
+    return {
+      status: false,
+      message: "Please provide bank name",
+    };
   }
 
-  if (!/^[2-9][0-9]{11}$/.test(aadhar_number)) {
-    return { status: false, message: "Invalid Aadhar number" };
+  const cibil = user.cibil;
+  if (cibil < 720) {
+    return {
+      res: { message: "You're not eligible for the loan" },
+    };
+  } else if (cibil > 720) {
+    return {
+      res: { message: "You're eligible for 100000" },
+    };
+  } else if (cibil > 800) {
+    return {
+      res: { message: "You're eligible for 2000000" },
+    };
+  } else if (cibil > 900) {
+    res: {
+      message: "You're eligible for 3000000";
+    }
   }
 
-  if (!/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(pan_number)) {
-    return { status: false, message: "Invalid PAN number" };
+  const pending = user.pendingloan;
+  if(pending){
+    return{
+      status: false,
+      message: "You have a pending loan"
+    }
   }
-
-  if (!/^\d{10,18}$/.test(bank_account_number)) {
-    return { status: false, message: "Invalid bank account number" };
-  }
-
-  if (!bank_name) {
-    return { status: false, message: "Bank name is required" };
-  }
-
-  if (pendingloan) {
-    return { status: false, message: "You have a pending loan" };
-  }
-
-  // Loan eligibility based on CIBIL score
-  let eligibility = "";
-  if (cibil_score < 720) {
-    eligibility = "You're not eligible for the loan";
-  } else if (cibil_score <= 800) {
-    eligibility = "You're eligible for ₹100000";
-  } else if (cibil_score <= 900) {
-    eligibility = "You're eligible for ₹2000000";
-  } else {
-    eligibility = "You're eligible for ₹3000000";
-  }
-
-  return {
-    status: true,
-    res: { message: eligibility },
-  };
 };
