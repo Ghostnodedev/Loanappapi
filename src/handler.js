@@ -206,15 +206,29 @@ const getdetails = async (req, res) => {
     const result = await fetchdata(user);
     const datavalid = await validdata(user);
     console.log(datavalid);
+
+    // Handle validation failure
+    if (datavalid.status === false) {
+      return res.status(400).json({
+        status: false,
+        message: datavalid.message || "Invalid data",
+      });
+    }
+
+    // Extract eligibility if validation passed
+    const eligibility = datavalid?.res?.message || null;
+
     if (!result) {
       return res.status(200).json({
         status: false,
         message: "User does not exist, you can apply",
+        eligibility: eligibility,
       });
     } else {
       return res.status(200).json({
         status: true,
         message: result.res.message,
+        eligibility: eligibility,
       });
     }
   } catch (error) {
@@ -225,6 +239,7 @@ const getdetails = async (req, res) => {
     });
   }
 };
+
 
 module.exports = getdetails;
 
