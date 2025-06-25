@@ -229,17 +229,35 @@ const getdetails = async (req, res) => {
 module.exports = getdetails;
 
 const validdata = async (user) => {
-  const { aadhar_number, pan_number, bank_account_number, bank_name, cibil_score, pendingloan } = user;
+  const {
+    aadhar_number,
+    pan_number,
+    bank_account_number,
+    bank_name,
+    cibil_score,
+    pendingloan = false // default to false if not provided
+  } = user;
 
-  if (!aadhar_number || !pan_number || !bank_account_number || !bank_name) {
+  // Debug: log values
+  console.log("aadhar:", aadhar_number);
+  console.log("pan:", pan_number);
+  console.log("bank_account_number:", bank_account_number);
+  console.log("bank_name:", bank_name);
+
+  if (
+    aadhar_number === undefined ||
+    pan_number === undefined ||
+    bank_account_number === undefined ||
+    bank_name === undefined
+  ) {
     return { status: false, message: "Missing required fields" };
   }
 
-  if (!/^[2-9]{1}[0-9]{11}$/.test(aadhar_number)) {
+  if (!/^[2-9][0-9]{11}$/.test(aadhar_number)) {
     return { status: false, message: "Invalid Aadhar number" };
   }
 
-  if (!/^[A-Z]{5}\d{4}[A-Z]$/.test(pan_number)) {
+  if (!/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(pan_number)) {
     return { status: false, message: "Invalid PAN number" };
   }
 
@@ -247,25 +265,29 @@ const validdata = async (user) => {
     return { status: false, message: "Invalid bank account number" };
   }
 
+  if (!bank_name) {
+    return { status: false, message: "Bank name is required" };
+  }
+
   if (pendingloan) {
     return { status: false, message: "You have a pending loan" };
   }
 
-  // Determine eligibility
-  let eligibilityMsg = "";
+  // Loan eligibility based on CIBIL score
+  let eligibility = "";
   if (cibil_score < 720) {
-    eligibilityMsg = "You're not eligible for the loan";
+    eligibility = "You're not eligible for the loan";
   } else if (cibil_score <= 800) {
-    eligibilityMsg = "You're eligible for ₹100000";
+    eligibility = "You're eligible for ₹100000";
   } else if (cibil_score <= 900) {
-    eligibilityMsg = "You're eligible for ₹2000000";
+    eligibility = "You're eligible for ₹2000000";
   } else {
-    eligibilityMsg = "You're eligible for ₹3000000";
+    eligibility = "You're eligible for ₹3000000";
   }
 
   return {
     status: true,
-    res: { message: eligibilityMsg },
+    res: { message: eligibility }
   };
 };
 
