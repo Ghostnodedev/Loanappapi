@@ -281,4 +281,3 @@ const validdata = async (user) => {
 
   return { status: true }; // default pass
 };
-
