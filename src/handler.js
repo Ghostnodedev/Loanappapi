@@ -229,17 +229,16 @@ const getdetails = async (req, res) => {
 module.exports = getdetails;
 
 const validdata = async (user) => {
-  const data = user;
-  console.log("data in validdata is : ",data.aadhar_number)
-  console.log("data in validdata is : ",data.pannumber)
-  console.log("data in validdata is : ",data.bank_account_number)
-  console.log("data in validdata is : ",data.bank)
+  console.log("data in validdata is : ", user.aadhar_number);
+  console.log("data in validdata is : ", user.pan_number); // fixed
+  console.log("data in validdata is : ", user.bank_account_number);
+  console.log("data in validdata is : ", user.bank_name); // fixed
 
   if (
-    !data.aadhar_number ||
-    !data.pannumber ||
-    !data.bank_account_number ||
-    !data.bank
+    !user.aadhar_number ||
+    !user.pan_number ||
+    !user.bank_account_number ||
+    !user.bank_name
   ) {
     return {
       status: false,
@@ -247,10 +246,10 @@ const validdata = async (user) => {
     };
   }
 
-  const aadhar = data.aadhar_number;
-  const pan = data.pannumber;
-  const bank = data.bank_account_number;
-  const bankname = data.bank;
+  const aadhar = user.aadhar_number;
+  const pan = user.pan_number;
+  const bank = user.bank_account_number;
+  const bankname = user.bank_name;
 
   if (!/^\d{12}$/.test(aadhar) || aadhar.startsWith("0")) {
     return { status: false, message: "Invalid aadhar number" };
@@ -260,7 +259,7 @@ const validdata = async (user) => {
     return { status: false, message: "Invalid pan number" };
   }
 
-  if (!/^\d{10}$/.test(bank)) {
+  if (!/^\d{10,16}$/.test(bank)) {
     return { status: false, message: "Invalid bank account number" };
   }
 
@@ -272,7 +271,7 @@ const validdata = async (user) => {
     return { status: false, message: "You have a pending loan" };
   }
 
-  const cibil = user.cibil;
+  const cibil = user.cibil_score; // fixed
   if (cibil < 720) {
     return { res: { message: "You're not eligible for the loan" } };
   } else if (cibil >= 720 && cibil <= 800) {
@@ -283,5 +282,6 @@ const validdata = async (user) => {
     return { res: { message: "You're eligible for 3000000" } };
   }
 
-  return { status: true }; // default pass
+  return { status: true };
 };
+
