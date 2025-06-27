@@ -230,7 +230,10 @@ module.exports = getdetails;
 
 const validdata = async (user) => {
   const data = user;
-  console.log("data in validdata is : ",data)
+  console.log("data in validdata is : ",data.aadhar_number)
+  console.log("data in validdata is : ",data.pannumber)
+  console.log("data in validdata is : ",data.bank_account_number)
+  console.log("data in validdata is : ",data.bank)
 
   if (
     !data.aadhar_number ||
