@@ -230,7 +230,7 @@ module.exports = getdetails;
 
 const validdata = async (user) => {
   const data = user;
-  console.log(data);
+
   if (
     !data.aadhar_number ||
     !data.pannumber ||
@@ -239,70 +239,46 @@ const validdata = async (user) => {
   ) {
     return {
       status: false,
+      message: "Missing required fields",
     };
   }
+
   const aadhar = data.aadhar_number;
   const pan = data.pannumber;
   const bank = data.bank_account_number;
   const bankname = data.bank;
 
-  if (
-    !/^\d{12}$/.test(aadhar) ||
-    aadhar.length !== 12 ||
-    aadhar.startsWith("0")
-  ) {
-    return {
-      status: false,
-      message: "Invalid aadhar number",
-    };
+  if (!/^\d{12}$/.test(aadhar) || aadhar.startsWith("0")) {
+    return { status: false, message: "Invalid aadhar number" };
   }
-  if (
-    !/^[A-Z]{5}\d{4}[A-Z]$/.test(pan) ||
-    pan.length !== 10 ||
-    pan.startsWith("0")
-  ) {
-    return {
-      status: false,
-      message: "Invalid pan number",
-    };
+
+  if (!/^[A-Z]{5}\d{4}[A-Z]$/.test(pan) || pan.startsWith("0")) {
+    return { status: false, message: "Invalid pan number" };
   }
+
   if (!/^\d{10}$/.test(bank)) {
-    return {
-      status: false,
-      message: "Invalid bank account number",
-    };
+    return { status: false, message: "Invalid bank account number" };
   }
+
   if (!bankname) {
-    return {
-      status: false,
-      message: "Please provide bank name",
-    };
+    return { status: false, message: "Please provide bank name" };
+  }
+
+  if (user.pendingloan) {
+    return { status: false, message: "You have a pending loan" };
   }
 
   const cibil = user.cibil;
   if (cibil < 720) {
-    return {
-      res: { message: "You're not eligible for the loan" },
-    };
-  } else if (cibil > 720) {
-    return {
-      res: { message: "You're eligible for 100000" },
-    };
-  } else if (cibil > 800) {
-    return {
-      res: { message: "You're eligible for 2000000" },
-    };
+    return { res: { message: "You're not eligible for the loan" } };
+  } else if (cibil >= 720 && cibil <= 800) {
+    return { res: { message: "You're eligible for 100000" } };
+  } else if (cibil > 800 && cibil <= 900) {
+    return { res: { message: "You're eligible for 2000000" } };
   } else if (cibil > 900) {
-    res: {
-      message: "You're eligible for 3000000";
-    }
+    return { res: { message: "You're eligible for 3000000" } };
   }
 
-  const pending = user.pendingloan;
-  if(pending){
-    return{
-      status: false,
-      message: "You have a pending loan"
-    }
-  }
+  return { status: true }; // default pass
 };
+
