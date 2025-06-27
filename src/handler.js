@@ -230,6 +230,7 @@ module.exports = getdetails;
 
 const validdata = async (user) => {
   const data = user;
+  console.log("data in validdata is : ",data)
 
   if (
     !data.aadhar_number ||
